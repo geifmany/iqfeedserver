@@ -25,7 +25,6 @@ connout, addr = sout.accept()
 print ('Connection address:', addr)
 
 s.connect((TCP_IP, TCP_PORT_IN))
-now = datetime.datetime.now()
 s.send(bytes('t@NQZ16\n','ascii'))
 
 s.send(bytes('w@NQZ16\n','ascii'))
@@ -57,7 +56,6 @@ while True:
             if data[0]=='T':
                 #time stamp, print it
                 print(data)
-    now = datetime.datetime.now()
 
 
 
