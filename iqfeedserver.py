@@ -9,10 +9,12 @@ import socket
 import datetime
 
 TCP_IP = '127.0.0.1'
+#incoming port to connect to IQfeed
 TCP_PORT_IN = 5009
+#outgoing port to connect to the trading algorithm
 TCP_PORT_OUT = 30000
 
-BUFFER_SIZE = 1024  # Normally 1024, but we want fast response
+BUFFER_SIZE = 1024  
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -28,7 +30,7 @@ s.send(bytes('t@NQZ16\n','ascii'))
 
 s.send(bytes('w@NQZ16\n','ascii'))
 incomplete = ''
-while 1:
+while True:
     datafull = (s.recv(BUFFER_SIZE)).decode('utf-8')
     datafull = str(incomplete+datafull).split('\n')
     incomplete = datafull.pop()
@@ -37,7 +39,7 @@ while 1:
         data = str(data)
         #print(data)
         if len(data)>0:
-            if data[0]=='Q':
+            if data[0]=='Q': #represents a quote
                 data = data.split(',')
                 if data[17][-1]=='t':
                     # get trade update last and quantity (volume)
@@ -49,6 +51,7 @@ while 1:
                         buys = buys+quant
                 bestbid = float(data[10])
                 bestask = float(data[11])
+                # build a text message to send to the trader and send it over TCP connout
                 message =bytes(str(bestbid)+','+str(bestask)+','+str(buys)+','+str(sells)+'\n','ascii')
                 connout.send(message)
             if data[0]=='T':
